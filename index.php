@@ -8,7 +8,53 @@ require_once 'functions.php';
 // Tentukan aksi yang akan dilakukan, defaultnya adalah 'list'
 $action = $_GET['action'] ?? 'list';
 
+// Public routes yang tidak butuh login
+$publicRoutes = ['login', 'authenticate'];
+
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id']) && !in_array($action, $publicRoutes)) {
+    // Jika belum login dan mengakses halaman protected, redirect ke login
+    header('Location: index.php?action=login');
+    exit;
+}
+
 switch ($action) {
+    case 'login':
+        if (isset($_SESSION['user_id'])) {
+            header('Location: index.php');
+            exit;
+        }
+        include 'templates/login.php';
+        break;
+
+    case 'authenticate':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim($_POST['username'] ?? '');
+            $password = $_POST['password'] ?? '';
+
+            $user = loginUser($username, $password);
+
+            if ($user) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+                setFlashMessage('success', 'Selamat datang, ' . htmlspecialchars($user['username']));
+                header('Location: index.php');
+                exit;
+            } else {
+                setFlashMessage('danger', 'Username atau password salah.');
+                header('Location: index.php?action=login');
+                exit;
+            }
+        }
+        header('Location: index.php?action=login');
+        exit;
+
+    case 'logout':
+        session_destroy();
+        header('Location: index.php?action=login');
+        exit;
+
     case 'add':
         // Menampilkan form untuk menambah barang
         include 'templates/form_barang.php';

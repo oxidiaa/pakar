@@ -5,7 +5,8 @@
  * Mengambil semua data barang dari database.
  * @return array
  */
-function getAllItems() {
+function getAllItems()
+{
     $conn = getDbConnection();
     $stmt = $conn->prepare("SELECT * FROM items ORDER BY nama_barang ASC");
     $stmt->execute();
@@ -17,7 +18,8 @@ function getAllItems() {
  * @param array $data Data barang
  * @return bool
  */
-function addItem($data) {
+function addItem($data)
+{
     $conn = getDbConnection();
     $sql = "INSERT INTO items (nama_barang, stok, rata_pemakaian, lead_time, minimum_stok) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
@@ -35,15 +37,16 @@ function addItem($data) {
  * @param array $item Data satu barang
  * @return string HTML badge untuk rekomendasi
  */
-function getStockRecommendation($item) {
-    $stok = (int)$item['stok'];
-    $pemakaian = (float)$item['rata_pemakaian'];
-    $leadTime = (int)$item['lead_time'];
-    $minStok = (int)$item['minimum_stok'];
+function getStockRecommendation($item)
+{
+    $stok = (int) $item['stok'];
+    $pemakaian = (float) $item['rata_pemakaian'];
+    $leadTime = (int) $item['lead_time'];
+    $minStok = (int) $item['minimum_stok'];
 
     // Safety stock: Kebutuhan selama lead time
     $kebutuhan = $pemakaian * $leadTime;
-    
+
     // Titik pemesanan ulang (Reorder Point)
     $reorderPoint = $kebutuhan + $minStok;
 
@@ -61,14 +64,16 @@ function getStockRecommendation($item) {
  * @param string $type Tipe pesan (e.g., 'success', 'danger')
  * @param string $message Pesan yang akan ditampilkan
  */
-function setFlashMessage($type, $message) {
+function setFlashMessage($type, $message)
+{
     $_SESSION['flash_message'] = ['type' => $type, 'message' => $message];
 }
 
 /**
  * Menampilkan dan menghapus pesan flash.
  */
-function displayFlashMessage() {
+function displayFlashMessage()
+{
     if (isset($_SESSION['flash_message'])) {
         $flash = $_SESSION['flash_message'];
         echo '<div class="alert alert-' . htmlspecialchars($flash['type']) . '" role="alert">' . htmlspecialchars($flash['message']) . '</div>';
@@ -82,7 +87,8 @@ function displayFlashMessage() {
  * @param int $id ID barang
  * @return array|false Data barang atau false jika tidak ditemukan
  */
-function getItemById($id) {
+function getItemById($id)
+{
     $conn = getDbConnection();
     $stmt = $conn->prepare("SELECT * FROM items WHERE id = ?");
     $stmt->execute([$id]);
@@ -94,7 +100,8 @@ function getItemById($id) {
  * @param array $data Data barang yang akan diupdate (termasuk id)
  * @return bool
  */
-function updateItem($data) {
+function updateItem($data)
+{
     $conn = getDbConnection();
     $sql = "UPDATE items SET 
                 nama_barang = ?, 
@@ -119,9 +126,30 @@ function updateItem($data) {
  * @param int $id ID barang
  * @return bool
  */
-function deleteItem($id) {
+function deleteItem($id)
+{
     $conn = getDbConnection();
     $stmt = $conn->prepare("DELETE FROM items WHERE id = ?");
     return $stmt->execute([$id]);
+}
+
+/**
+ * Verifikasi login user.
+ * @param string $username Username
+ * @param string $password Password
+ * @return array|false Data user jika sukses, false jika gagal
+ */
+function loginUser($username, $password)
+{
+    $conn = getDbConnection();
+    // Hanya ambil user dengan role admin
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'admin'");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+        return $user;
+    }
+    return false;
 }
 ?>

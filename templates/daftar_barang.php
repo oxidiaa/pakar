@@ -5,10 +5,10 @@ include 'header.php';
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="mb-1">Manajemen Stok Barang</h2>
-        <p class="text-muted">Daftar semua barang habis pakai yang tersimpan dalam sistem.</p>
-    </div>
+  <div>
+    <h2 class="mb-1">Manajemen Stok Barang</h2>
+    <p class="text-muted">Daftar semua barang habis pakai yang tersimpan dalam sistem.</p>
+  </div>
 </div>
 
 <?php
@@ -33,7 +33,7 @@ displayFlashMessage();
             <th>Pemakaian/Hari</th>
             <th>Lead Time</th>
             <th>Min. Stok</th>
-            <th>Status</th>
+            <th>Rekomendasi Status</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -58,7 +58,8 @@ displayFlashMessage();
                   <a href="index.php?action=edit&id=<?= $item['id']; ?>" class="btn btn-warning btn-sm" title="Edit">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
-                  <a href="index.php?action=delete&id=<?= $item['id']; ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus barang ini?');">
+                  <a href="index.php?action=delete&id=<?= $item['id']; ?>" class="btn btn-danger btn-sm" title="Hapus"
+                    onclick="return confirm('Apakah Anda yakin ingin menghapus barang ini?');">
                     <i class="fas fa-trash-alt"></i>
                   </a>
                 </td>
